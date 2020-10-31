@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# custom directories
+raw_data/*
+results/*
+.vscode/*
+resources/*

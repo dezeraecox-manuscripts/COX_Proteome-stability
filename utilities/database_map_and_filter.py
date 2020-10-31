@@ -8,6 +8,7 @@ import networkx
 import obonet
 import pandas as pd
 import tarfile
+import gzip, shutil, os, re
 import time
 from pyorthomap import findOrthologsHsMm, findOrthologsMmHs
 

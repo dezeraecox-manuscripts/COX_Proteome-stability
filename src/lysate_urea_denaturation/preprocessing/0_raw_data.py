@@ -23,6 +23,13 @@ if __name__ == "__main__":
     # with zipfile.ZipFile(f'{output_folder}{folder_name}.zip', 'r') as zip_ref:
     #     zip_ref.extractall(f'{output_folder}{folder_name}')
 
+    # Current solution 
+    input_folder = 'C:/Users/Dezerae/Documents/Current Writing/180701_Manuscipt_Urea denaturation in lysate/data_and_analysis/experiments/200831_Analysis_Experiment 20 Refactoring/raw_data/'
+    output_folder = 'raw_data/lysate_urea_denaturation/'
+    file_list = [filename for filename in os.listdir(input_folder) if '.xlsx' in filename]
+    for filename in file_list:
+        copyfile(f'{input_folder}{filename}', f'{output_folder}{filename}')
+
     # Download useful databases to resources folder
     database_collection.main(tax_ids=['10090', '9606'], resource_folder='resources/bioinformatics_databases/', caller_id = "www.github.com/dezeraecox")
     

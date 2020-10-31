@@ -11,9 +11,11 @@ import requests
 import xmltodict
 from collections import OrderedDict
 import json
+from contextlib import closing
+import urllib.request as request
 
 from utilities.decorators import ProgressBar
-from utilities.database_map_and_filter import convert_geneids
+from utilities.database_map_and_filter import convert_geneids, gz_unzipper
 
 from loguru import logger
 from GEN_Utils import FileHandling
@@ -45,7 +47,7 @@ def download_resources(filename, url, resource_folder):
                 shutil.copyfileobj(r, f)
         logger.info(f'Downloaded {filename}')
     except:
-        logger.info(f'Downloaded failed.')
+        logger.info(f'Downloaded failed for {filename}.')
 
 
 # ----------------------------------Collect/generate static databases--------------------------
@@ -393,43 +395,55 @@ def pfam_domains(accession_ids, resource_folder='resources/bioinformatics_databa
     return pd.concat(pfam).reset_index(drop=True)
 
 
-
-
-if __name__ == "__main__":
+def main(tax_ids={'MOUSE': '10090', 'HUMAN': '9606'}, resource_folder='resources/bioinformatics_databases/', caller_id = "www.github.com/dezeraecox"):
 
     # download useful databases if they don't already exist
-    tax_ids = ['10090', '9606']
-    resource_folder = 'resources/bioinformatics_databases/'
-
     string_api_url = "https://string-db.org/api"
     output_format = "tsv"
-    caller_id = "www.github.com/dezeraecox"
 
     if not os.path.exists(resource_folder):
         os.makedirs(resource_folder)
 
-    for tax_id in tax_ids:
-        if not os.path.exists(f'{resource_folder}{tax_id}.tab.gz'):
+    for species, tax_id in tax_ids.items():
+        if not os.path.exists(f'{resource_folder}{tax_id}_idmapping.tab.gz'):
             download_resources(
                 filename=f'{tax_id}_idmapping.tab.gz',
-                url=f'https://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/{tax_ids[tax_id]}_{tax_id}_idmapping_selected.tab.gz',
+                url=f'https://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/{species}_{tax_id}_idmapping_selected.tab.gz',
                 resource_folder=resource_folder)
+        gz_unzipper(f'{tax_id}_idmapping.tab', input_path=resource_folder, output_path=resource_folder)
+
+
         if not os.path.exists(f'{resource_folder}{tax_id}.tab.gz'):
             download_resources(
                 filename=f'{tax_id}.tab.gz',
-                url=f'https://www.uniprot.org/uniprot/?query={tax_id}&%28{tax_ids[tax_id]}%29+%5B%22&fil=&offset=0&compress=yes&format=tab',
+                url=f'https://www.uniprot.org/uniprot/?query={tax_id}&%28{species}%29+%5B%22&fil=&offset=0&compress=yes&format=tab',
                 resource_folder=resource_folder)
+        gz_unzipper(f'{tax_id}.tab', input_path=resource_folder, output_path=resource_folder)
 
-    if not os.path.exists(f'{resource_folder}{obo_path}'):
+
+    if not os.path.exists(f'{resource_folder}PANTHERGOslim.obo'):
         download_resources(
-            filename=f'{obo_path}',
+            filename=f'PANTHERGOslim.obo',
             url=f'http://data.pantherdb.org/PANTHER15.0/ontology/PANTHERGOslim.obo',
             resource_folder=resource_folder)
 
-    # Unzipping and cleaning standard databases
-    for database in ['pdb_seqres.txt', 'ss_dis.txt']:
-        if not os.path.exists(f'{resource_folder}{database}'):
-            gz_unzipper('pdb_seqres.txt', input_path=resources_folder, output_path=resources_folder)
+    if not os.path.exists(f'{resource_folder}ss_dis.txt'):
+        download_resources(
+            filename=f'ss_dis.txt.gz',
+            url=f'https://cdn.rcsb.org/etl/kabschSander/ss_dis.txt.gz',
+            resource_folder=resource_folder)
+        gz_unzipper('ss_dis.txt', input_path=resource_folder, output_path=resource_folder)
+        
+    if not os.path.exists(f'{resource_folder}pdb_seqres.txt'):
+        download_resources(
+            filename=f'pdb_seqres.txt.gz',
+            url=f'https://ftp.wwpdb.org/pub/pdb/derived_data/pdb_seqres.txt.gz',
+            resource_folder=resource_folder)
+        gz_unzipper('pdb_seqres.txt', input_path=resource_folder, output_path=resource_folder)
+
+
+if __name__ == "__main__":
+    main()
 
 
 
