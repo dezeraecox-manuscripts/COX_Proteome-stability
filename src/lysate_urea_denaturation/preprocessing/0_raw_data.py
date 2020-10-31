@@ -14,6 +14,7 @@ if __name__ == "__main__":
     url = 'https://' # update to repository address
     folder_name = 'lysate_urea_denaturation/'
     output_folder = 'raw_data/lysate_urea_denaturation/'
+    resource_folder='resources/bioinformatics_databases/'
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     # with zipfile.ZipFile(f'{output_folder}{folder_name}.zip', 'r') as zip_ref:
     #     zip_ref.extractall(f'{output_folder}{folder_name}')
 
+
     # Current solution 
     input_folder = 'C:/Users/Dezerae/Documents/Current Writing/180701_Manuscipt_Urea denaturation in lysate/data_and_analysis/experiments/200831_Analysis_Experiment 20 Refactoring/raw_data/'
     output_folder = 'raw_data/lysate_urea_denaturation/'
@@ -31,7 +33,10 @@ if __name__ == "__main__":
         copyfile(f'{input_folder}{filename}', f'{output_folder}{filename}')
 
     # Download useful databases to resources folder
-    database_collection.main(tax_ids=['10090', '9606'], resource_folder='resources/bioinformatics_databases/', caller_id = "www.github.com/dezeraecox")
+    database_collection.main(tax_ids=['10090', '9606'], resource_folder=resource_folder, caller_id = "www.github.com/dezeraecox")
+
+    # Copy pre-mapped ID database
+    copyfile(f'{output_folder}Ori_complex_db_mapped_ids.xlsx', f'{resource_folder}Ori_complex_db_mapped_ids.xlsx')
     
 
 

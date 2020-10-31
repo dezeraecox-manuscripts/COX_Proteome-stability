@@ -441,6 +441,13 @@ def main(tax_ids={'MOUSE': '10090', 'HUMAN': '9606'}, resource_folder='resources
             resource_folder=resource_folder)
         gz_unzipper('pdb_seqres.txt', input_path=resource_folder, output_path=resource_folder)
 
+    if not os.path.exists(f'{resource_folder}HOM_MouseHumanSequence.txt'):
+        download_resources(
+            filename=f'HOM_MouseHumanSequence.txt',
+            url=f'http://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt',
+            resource_folder=resource_folder)
+        
+
 
 if __name__ == "__main__":
     main()
