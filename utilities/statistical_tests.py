@@ -31,6 +31,7 @@ from statsmodels.stats.multitest import multipletests
 from scikit_posthocs import posthoc_dunn
 logger.info('Import OK')
 
+resource_folder = f'resources/bioinformatics_databases/'
 
 def enrichment(organism, refOrganism, annotDataSet, enrichmentTestType, correction, genes, obo_path, reference=[]):
 
@@ -192,7 +193,7 @@ def enrichment(organism, refOrganism, annotDataSet, enrichmentTestType, correcti
     return sig_results
 
 
-def apply_enrichment(df, searches=None, obo_path='PANTHERGOslim.obo', organism='10090', refOrganism='10090', enrichmentTestType='FISHER', correction='BONFERONNI', min_proteins=5, reference=None):
+def apply_enrichment(df, searches=None, obo_path=f'{resource_folder}PANTHERGOslim.obo', organism='10090', refOrganism='10090', enrichmentTestType='FISHER', correction='BONFERONNI', min_proteins=5, reference=None):
     """
     Worker function to apply GO enrichment for df of proteins against the reference list (background) on a per-column basis. Column labels are returned in the 'column' key
     """

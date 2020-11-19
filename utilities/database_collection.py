@@ -13,6 +13,7 @@ from collections import OrderedDict
 import json
 from contextlib import closing
 import urllib.request as request
+import time
 
 from utilities.decorators import ProgressBar
 from utilities.database_map_and_filter import convert_geneids, gz_unzipper
@@ -63,6 +64,9 @@ def retrieve_asa(protein, chains=False, resource_folder='resources/bioinformatic
     Loads a value beteween 0.0 (fully buried) and 1.0 (fully exposed) into the b-factor property, available in "iterate", "alter" and "label" as "b".
     """
     output_folder=f'{resource_folder}pymol_asa/'
+    
+    if not os.path.exists(f'{output_folder}'):
+        os.mkdir(f'{output_folder}')
 
     cmd.delete('all')
     structure = cmd.fetch(protein)
@@ -82,28 +86,28 @@ def retrieve_asa(protein, chains=False, resource_folder='resources/bioinformatic
 
     return summary
 
-def asa_calculator(pdb_info, output_folder):
-
-    if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+def asa_calculator(pdb_info, resource_folder='resources/bioinformatics_databases/'):
 
     pymol_asa = []
     nonmapped = []
     for structure, seqs in pdb_info.groupby('pdb_id'):
         chains = seqs['chain'].unique().tolist()
         try:
-            pymol_asa.append(retrieve_asa(structure, chains, output_folder))
+            pymol_asa.append(retrieve_asa(structure, chains, resource_folder))
             yield
         except:
             nonmapped.append(structure)
     asa_summary = pd.concat(pymol_asa)
-    asa_summary.to_csv(f'{output_folder}asa_summary.csv')
+    asa_summary.to_csv(f'{resource_folder}asa_summary.csv')
     return asa_summary
 
 
 # ----------------------------------API/live search functions----------------------------------
 
 def uniprot_download(genes, output_folder):
+
+    if not os._exists(output_folder):
+        os.makedirs(output_folder)
 
     for gene in genes:
         url = f'https://www.uniprot.org/uniprot/{gene}.xml'
@@ -257,13 +261,13 @@ def network_interactions(genes, tax_id, id_type='string', string_api_url="https:
     results = pd.DataFrame(response.text.strip().split("\n"))
     results = results[0].str.strip().str.split("\t", expand=True).T.set_index(0).T
     if not id_type == 'string':
-        results['originalId_A'] = results['stringId_A'].map(dict(zip(id_map['string'], id_map['queryItem'])))
-        results['originalId_B'] = results['stringId_B'].map(dict(zip(id_map['string'], id_map['queryItem'])))
+        results['originalId_A'] = results['stringId_A'].map(dict(zip(id_map['stringId'], id_map['queryItem'])))
+        results['originalId_B'] = results['stringId_B'].map(dict(zip(id_map['stringId'], id_map['queryItem'])))
 
     return results
 
 
-def all_interactions( genes, tax_id, max_partners=100, id_type='string', string_api_url="https://string-db.org/api", output_format='tsv', caller_id="www.github.com/dezeraecox"):
+def all_interactions( genes, tax_id, max_partners=1000, id_type='string', string_api_url="https://string-db.org/api", output_format='tsv', caller_id="www.github.com/dezeraecox", confidence_threshold=0.7):
 
     """
     id_type: STRING=premapped ids to Esembl, UNIPROT ids will be premapped to STRING
@@ -276,33 +280,59 @@ def all_interactions( genes, tax_id, max_partners=100, id_type='string', string_
         except:
             logger.info('Unable to map genes to STRING format.')
     
-    # set parameters
-    method = "interaction_partners"
-    params = {
-        "identifiers" : "%0d".join(genes), # your proteins
-        "species" : tax_id, # species NCBI identifier 
-        "limit" : max_partners,
-        "caller_identity" : caller_id # your app name
-    }
+    def interactors_search(genes):
+        # set parameters
+        method = "interaction_partners"
+        params = [
+            f'identifiers={"%0D".join(genes)}', # your proteins
+            f'species={tax_id}', # species NCBI identifier 
+            f'limit={max_partners}',
+            f'caller_identity={caller_id}' # your app name
+        ]
 
-    # Construct URL
-    request_url = "/".join([string_api_url, output_format, method])
-    # Call STRING
-    response = requests.post(request_url, data=params)
+        # Construct URL
+        request_url = "/".join([string_api_url, output_format, method])
+        request_url = f'{request_url}?{"&".join(params)}'
 
-    results = pd.DataFrame(response.text.strip().split("\n"))
-    results = results[0].str.strip().str.split("\t", expand=True).T.set_index(0).T
+        # Call STRING
+        response = requests.get(request_url)
 
-    gene_ids = results['stringId_A'].tolist() + results['stringId_B'].tolist()
-    gene_map = convert_geneids(gene_ids, tax_id=10090, id_from='STRING', id_to='uniprot')
+        results = pd.DataFrame(response.text.strip().split("\n"))
+        results = results[0].str.strip().str.split("\t", expand=True).T.set_index(0).T
+    
+        return results
+    
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+
+    interactions = []
+    for number, gene_list in enumerate(chunks(genes, 10)):
+        try:
+            try:
+                interactions.append(interactors_search(gene_list))
+            except:
+                time.sleep(5)
+                interactions.append(interactors_search(gene_list))
+            logger.info(f'Processed chunk number {number}')
+        except:
+            logger.info(f'{gene_list} not processed.')    
+
+    interactions = pd.concat(test)
+    interactions = interactions[interactions['score'].astype(float) >= confidence_threshold]
+    interactions = interactions[interactions['stringId_A'].str.strip(f'{tax_id}.').isin(genes) | interactions['stringId_B'].str.strip(f'{tax_id}.').isin(genes)]
+
+    genes_to_map = interactions['stringId_A'].unique().tolist() + interactions['stringId_B'].unique().tolist()
+    gene_map = convert_geneids(genes_to_map, tax_id=10090, id_from='STRING', id_to='uniprot')
     gene_map['string_id'] = gene_map['ID'].str.split('.').str[1]
     gene_map = dict(zip(gene_map['string_id'], gene_map['UniProtKB-AC']))
     gene_map.update(dict(zip(id_map['string'], id_map['queryItem'])))
 
-    results['uniprot_A'] = results['stringId_A'].map(gene_map)
-    results['uniprot_B'] = results['stringId_B'].map(gene_map)
+    interactions['uniprot_A'] = interactions['stringId_A'].str.strip(f'{tax_id}.').map(gene_map)
+    interactions['uniprot_B'] = interactions['stringId_B'].str.strip(f'{tax_id}.').map(gene_map)
     
-    return results
+    return interactions
 
 
 def interaction_enrichment( genes, tax_id, id_type='string', string_api_url="https://string-db.org/api", output_format='tsv', caller_id="www.github.com/dezeraecox"):
@@ -395,7 +425,7 @@ def pfam_domains(accession_ids, resource_folder='resources/bioinformatics_databa
     return pd.concat(pfam).reset_index(drop=True)
 
 
-def main(tax_ids={'MOUSE': '10090', 'HUMAN': '9606'}, resource_folder='resources/bioinformatics_databases/', caller_id = "www.github.com/dezeraecox"):
+def main(tax_ids={'MOUSE': '10090', 'HUMAN': '9606'}, resource_folder='resources/bioinformatics_databases/', caller_id = "www.github.com/dezeraecox", fasta_codes={'10090': 'UP000000589', '9606': 'UP000005640'}):
 
     # download useful databases if they don't already exist
     string_api_url = "https://string-db.org/api"
@@ -419,7 +449,21 @@ def main(tax_ids={'MOUSE': '10090', 'HUMAN': '9606'}, resource_folder='resources
                 url=f'https://www.uniprot.org/uniprot/?query={tax_id}&%28{species}%29+%5B%22&fil=&offset=0&compress=yes&format=tab',
                 resource_folder=resource_folder)
         gz_unzipper(f'{tax_id}.tab', input_path=resource_folder, output_path=resource_folder)
-
+    
+        if not os.path.exists(f'{resource_folder}{tax_id}.fasta.gz'):
+            code = fasta_codes[tax_id]
+            download_resources(
+                filename=f'{tax_id}.fasta.gz',
+                url=f'https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/{code}_{tax_id}.fasta.gz',
+                resource_folder=resource_folder)
+        gz_unzipper(f'{tax_id}.fasta', input_path=resource_folder, output_path=resource_folder)
+    
+        if not os.path.exists(f'{resource_folder}{tax_id}_idmapping.dat.gz'):
+            download_resources(
+                filename=f'{tax_id}_idmapping.dat.gz',
+                url=f'https://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/{species}_{tax_id}_idmapping.dat.gz',
+                resource_folder=resource_folder)
+                
 
     if not os.path.exists(f'{resource_folder}PANTHERGOslim.obo'):
         download_resources(
@@ -446,8 +490,13 @@ def main(tax_ids={'MOUSE': '10090', 'HUMAN': '9606'}, resource_folder='resources
             filename=f'HOM_MouseHumanSequence.txt',
             url=f'http://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt',
             resource_folder=resource_folder)
-        
 
+    if not os.path.exists(f'{resource_folder}hmmer_pdb_all.txt'):
+        download_resources(
+            filename=f'hmmer_pdb_all.txt',
+            url=f'https://www.rcsb.org/pdb/rest/hmmer?file=hmmer_pdb_all.txt',
+            resource_folder=resource_folder)    
+        
 
 if __name__ == "__main__":
     main()

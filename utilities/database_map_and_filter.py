@@ -94,7 +94,7 @@ def uniprot_go_genes(tax_id, go_term, resource_folder=resource_folder, child_ter
 
     # collect search terms according to optional child terms and direct lineage
     if child_terms:
-        search_terms = go_lineage_tracer(go_term, obo_path='PANTHERGOslim.obo', alt_ids=False, direct=direct)
+        search_terms = go_lineage_tracer(go_term, obo_path=f'{resource_folder}PANTHERGOslim.obo', alt_ids=False, direct=direct)
         search_terms = '|'.join(search_terms)
     else:
         search_terms = go_term
@@ -112,7 +112,7 @@ def uniprot_go_genes(tax_id, go_term, resource_folder=resource_folder, child_ter
         gene_list.to_csv(output)
 
 
-def ontology_wordfinder(words, obo_path='PANTHERGOslim.obo', resource_folder=resource_folder):
+def ontology_wordfinder(words, obo_path=f'{resource_folder}PANTHERGOslim.obo', resource_folder=resource_folder):
     """Retrieves all ontology terms containing 'words' in the name.
     words: list of words to search
     return: df of term, name matches"""
@@ -131,7 +131,7 @@ def ontology_wordfinder(words, obo_path='PANTHERGOslim.obo', resource_folder=res
     return terms[terms['go_name'].str.contains(search_words)]
 
 
-def go_term_details(go_terms, obo_path='PANTHERGOslim.obo', resource_folder=resource_folder):
+def go_term_details(go_terms, obo_path=f'{resource_folder}PANTHERGOslim.obo', resource_folder=resource_folder):
     """Retrieves details for all go terms as df.
     go_terms: list of term_ids to search
     return: df of term, name matches"""
@@ -381,7 +381,7 @@ def ortholog_map(gene_ids, direction, output_folder, resource_folder=resource_fo
 
     # Generate mapped ids using orthologsBioMART
     # Collect appropriate id's - note this is not necessarily going to generate unique id's
-    gene_identifiers_from = create_uniprot_xref(input_path=f'{resource_folder}9606_idmapping.dat.gz', gene_ids=gene_ids, id_type='Ensembl')
+    gene_identifiers_from = create_uniprot_xref(input_path=f'{resource_folder}', tax_id='9606', gene_ids=gene_ids, id_type='Ensembl')
     gene_identifiers_from = dict(zip(gene_identifiers_from['UniProtKB-AC'], gene_identifiers_from['ID']))
     # Collect orthologous genes
     if direction == 'h2m':
@@ -391,7 +391,7 @@ def ortholog_map(gene_ids, direction, output_folder, resource_folder=resource_fo
         mapped_ids = biomart_m2h(list(gene_identifiers_from.values()), identifier_type='link_ensembl_gene_id')
         uniprot_tax_ids = {'from': '10090', 'to': '9606'}
     # map ensembl back to uniprot
-    gene_identifiers_to = create_uniprot_xref(input_path=f'{resource_folder}10090_idmapping.dat.gz', gene_ids=[], id_type='Ensembl')
+    gene_identifiers_to = create_uniprot_xref(input_path=f'{resource_folder}', tax_id='10090', gene_ids=[], id_type='Ensembl')
     gene_identifiers_to = dict(zip(gene_identifiers_to['ID'], gene_identifiers_to['UniProtKB-AC']))
     # Add Uniprot info back to the mapped ids
     mapped_ids['Entry_to'] = mapped_ids['mouse_ensembl_gene_id'].map(gene_identifiers_to)
