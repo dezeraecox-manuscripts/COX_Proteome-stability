@@ -133,3 +133,4 @@ raw_data/*
 results/*
 .vscode/*
 resources/*
+.pybiomart.sqlite

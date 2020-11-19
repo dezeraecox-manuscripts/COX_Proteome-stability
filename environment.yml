@@ -1,0 +1,39 @@
+name: proteome_stability
+
+channels:
+- defaults
+- conda-forge
+- schrodinger
+- biobuilds
+- bioconda
+
+dependencies:
+  - seaborn==0.10.1
+  - scipy==1.5.0
+  - requests==2.24.0
+  - matplotlib==3.3.0
+  - phylopandas==0.8.0
+  - statsmodels==0.11.1
+  - pykalman==0.9.5
+  - numpy==1.19.1
+  - pandas==1.0.5
+  - scikit_fuzzy==0.4.2
+  - obonet==0.2.3
+  - networkx==2.4
+  - fuzzywuzzy==0.17.0
+  - beautifulsoup4==4.9.3
+  - Bio==0.0.6
+  - ipython==7.19.0
+  - pymol==0.1.0
+  - scikit_learn==0.23.2
+  - pip:
+    - fuzzysearch==0.7.3
+    - kneed==0.6.0
+    - loguru==0.5.1
+    - lmfit==1.0.1
+    - pybiomart==0.2.0
+    - pyorthomap==0.1
+    - scikit_posthocs==0.6.4
+    - simple_venn==0.1.0
+    - UpSetPlot==0.4.0
+    - xmltodict==0.12.0
