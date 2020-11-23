@@ -11,10 +11,9 @@ logger.info('Import OK')
 
 if __name__ == "__main__":
 
-    url = 'https://zenodo.org/record/4280621/files/lysate_denaturation.zip?download=1' # update to repository address
-    folder_name = 'lysate_denaturation/'
+    url = 'https://zenodo.org/record/4280621/files/recombinant_denaturation.zip?download=1' # update to repository address
+    folder_name = 'recombinant_denaturation/'
     output_folder = 'raw_data/'
-    resource_folder='resources/bioinformatics_databases/'
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)

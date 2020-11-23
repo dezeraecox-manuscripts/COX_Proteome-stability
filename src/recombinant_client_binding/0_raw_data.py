@@ -11,10 +11,9 @@ logger.info('Import OK')
 
 if __name__ == "__main__":
 
-    url = 'https://zenodo.org/record/4280621/files/lysate_denaturation.zip?download=1' # update to repository address
-    folder_name = 'lysate_denaturation/'
+    url = 'https://zenodo.org/record/4280621/files/recombinant_client_assay.zip?download=1' 
+    folder_name = 'recombinant_client_assay'
     output_folder = 'raw_data/'
-    resource_folder='resources/bioinformatics_databases/'
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -23,3 +22,7 @@ if __name__ == "__main__":
     database_collection.download_resources(filename=f'{folder_name}.zip', url=url, resource_folder=output_folder) 
     with zipfile.ZipFile(f'{output_folder}{folder_name}.zip', 'r') as zip_ref:
         zip_ref.extractall(f'{output_folder}{folder_name}')
+
+    
+
+
