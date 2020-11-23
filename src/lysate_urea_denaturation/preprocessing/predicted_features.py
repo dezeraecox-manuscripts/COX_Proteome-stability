@@ -23,7 +23,7 @@ logger.info('Import OK')
 
 
 background_path = f'results/lysate_denaturation/normalised/normalised_summary.xlsx'
-input_folder = f'raw_data/lysate_urea_denaturation/predicted_features/'
+input_folder = f'raw_data/lysate_denaturation/predicted_features/'
 output_folder = 'results/lysate_denaturation/predicted_features/'
 
 resource_folder = 'resources/bioinformatics_databases/'

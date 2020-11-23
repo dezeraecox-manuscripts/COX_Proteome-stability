@@ -11,7 +11,7 @@ from loguru import logger
 
 logger.info('Import OK')
 
-input_folder = 'raw_data/lysate_urea_denaturation/'
+input_folder = 'raw_data/lysate_denaturation/'
 output_folder = 'results/lysate_denaturation/initial_cleanup/'
 
 if not os.path.exists(output_folder):
