@@ -1,5 +1,8 @@
 # COX_Proteome-stability
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4280621.svg)](https://doi.org/10.5281/zenodo.4280621)
+
+
 This repository contains the analysis code associated with the Proteome Folding Stability project, led by Dr. Dezerae Cox. This manuscript has been submitted for publication under the title "Surveyance of proteome foldedness unmasks hidden information on protein binding and conformation".
 
 Final version will be provided upon publication.
@@ -12,7 +15,7 @@ This analysis assumes a standard installation of Python 3 (=> 3.6). For specific
 
 In the case of the published dataset comparison, raw data in the form of supplementary datasets from each publication can be accessed in part using the appropriate ```raw_data.py``` script. Unfortunately, due to journal subscription requirements, in some instances journal access is required. In these cases, datasets will need to be manually downloaded.
 
-Initial processing of the novel mass spectrometry spectra files was completed using either Proteome Discoverer or MaxQuant. The preprocessed identification and quantitation data have been deposited alongside the ```.RAW``` files via the PRIDE [1] partner repository to the ProteomeXchange Consortium under the dataset identifiers PXD022587 and PXD022640. For convenience, the preprocessed identification and quantitation data (hereon termed raw data) have also been uploaded alongside the other raw data as an open-access [Zenodo dataset](https://doi.org/10.5281/zenodo.4280621). These datasets can be collected automatically using the ```raw_data.py``` script in each of the respective analysis folders.
+Initial processing of the novel mass spectrometry spectra files was completed using either Proteome Discoverer or MaxQuant. The preprocessed identification and quantitation data have been deposited alongside the ```.RAW``` files via the PRIDE [1] partner repository to the ProteomeXchange Consortium under the dataset identifiers PXD022587 and PXD022640. For convenience, the preprocessed identification and quantitation data (hereon termed raw data) have also been uploaded alongside the other raw data as an open-access [Zenodo dataset](https://doi.org/10.5281/zenodo.4280620). These datasets can be collected automatically using the ```raw_data.py``` script in each of the respective analysis folders.
 
 Lastly, various public databases were queried as indicated in the accompanying manuscript, for which access protocols are also provided in the respective analysis workflow where appropriate.
 
