@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Download file from repository
     database_collection.download_resources(filename=f'{folder_name}.zip', url=url, resource_folder=output_folder) 
     with zipfile.ZipFile(f'{output_folder}{folder_name}.zip', 'r') as zip_ref:
-        zip_ref.extractall(f'{output_folder}{folder_name}')
+        zip_ref.extractall(f'{output_folder}')
 
     
 
