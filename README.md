@@ -1,7 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4287767.svg)](https://doi.org/10.5281/zenodo.4287767) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4280621.svg)](https://doi.org/10.5281/zenodo.4280621)
+
 # COX_Proteome-stability
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4280621.svg)](https://doi.org/10.5281/zenodo.4280621)
-
 
 This repository contains the analysis code associated with the Proteome Folding Stability project, led by Dr. Dezerae Cox. This manuscript has been submitted for publication under the title "Surveyance of proteome foldedness unmasks hidden information on protein binding and conformation".
 
