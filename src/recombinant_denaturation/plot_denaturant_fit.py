@@ -124,3 +124,45 @@ for time in [4, 24]:
     plt.savefig(f'{output_folder}{time}h_mixedfit.png')
     plt.savefig(f'{output_folder}{time}h_mixedfit.svg')
     plt.show()
+
+# account for pre-and post transition
+for time in [4, 24]:
+    samples = [key for key in raw_data.keys() if f'_{time}h' in key]
+
+    fig_mixed, ax = plt.subplots(figsize=(6, 5))
+    for key in samples:
+        x_vals, y_vals, summary_plot, colour, label = fit_params[key]
+        fitted_params = [model_dict[key].params[parameter].value for parameter in list(
+            model_dict[key].params.keys())]
+        cM = fitted_params[4] / fitted_params[5] # deltaG/m
+        x = np.linspace(0, np.max(summary_plot.index.tolist()), 50) 
+        y_pre = linear(
+            x, model_dict[key].params['mf'].value, model_dict[key].params['yf'].value)
+        y_post = linear(
+            x, model_dict[key].params['mu'].value, model_dict[key].params['yu'].value)
+
+        y = model_dict[key].eval(urea=x)
+        if 'TPE' in key:
+            deltaG, m = - fitted_params[4], - fitted_params[5]
+        else:
+            deltaG, m = fitted_params[4], fitted_params[5]
+
+        y_corrected = denaturant_curve(
+            x, 1, 0, 0, 0, deltaG, m)  # setting pre and post transitions to be zero, then plotting the deltaG and M from fit
+
+        # Add plot with each component (pre, post, transition)
+        # plt.errorbar(summary_plot.index, summary_plot[('fluorescence', 'mean')], yerr=summary_plot[(
+        #     'fluorescence', 'std')], fmt='none', ecolor=colour, capsize=5)
+        plt.plot(x, y, color=colour, marker=None, label=label, alpha=0.3)
+        plt.plot(x, y_corrected, color=colour, marker=None, label=label)
+        ax.axvline(cM, color=colour, linestyle='--')
+    plt.legend()
+    plt.ylabel('Fraction unfolded')
+    plt.xlabel('Urea (M)')
+    plt.ylim(-0.05, 1.05)
+    # plt.autoscale()
+    plt.tight_layout()
+    plt.savefig(f'{output_folder}{time}h_mixedfit_corrected.png')
+    plt.savefig(f'{output_folder}{time}h_mixedfit_corrected.svg')
+    plt.show()
+

@@ -170,8 +170,8 @@ for i, dataset_1 in enumerate(datasets):
         ax = axes[i][j]
         if i == j:
             # kde plot
-            # kde_plotter(dataset_1, ax, data=scaled_ko, color_df=correlation)
-            pass
+            kde_plotter(dataset_1, ax, data=scaled_ko, color_df=correlation)
+            # pass
         if i < j:
             # hex_plotter(x_col=dataset_2, y_col=dataset_1, ax=ax, data=scaled_ko)
             corr_color = correlation[(correlation['dataset_1'] == dataset_1) & (correlation['dataset_2'] == dataset_2)]['corr_color'].tolist()[0]
@@ -181,13 +181,9 @@ for i, dataset_1 in enumerate(datasets):
                 ax.annotate('**', (0.25, 0.2), fontsize=40)
             elif pval < 0.05:
                 ax.annotate('*', (0.35, 0.2), fontsize=40)
-            else:
-                pass
         if i > j:
             # hex plot
             hex_plotter(x_col=dataset_2, y_col=dataset_1, ax=ax, data=scaled_ko, color_df=correlation)
-            pass
-
         # axes fix labels
         remove_labels(ax, i, j, f'{positions[dataset_2]}', f'{positions[dataset_1]}')
 
