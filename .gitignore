@@ -134,3 +134,4 @@ results/*
 .vscode/*
 resources/*
 .pybiomart.sqlite
+logs/*
