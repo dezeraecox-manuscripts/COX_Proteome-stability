@@ -174,7 +174,7 @@ if __name__ == "__main__":
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
 
-    for sample_name in ['Heat-A', 'Heat-B']:
+    for sample_name in ['Heat-A', 'Heat-B', 'Urea-A', 'Urea-B']:
         main(sample_name)
 
 

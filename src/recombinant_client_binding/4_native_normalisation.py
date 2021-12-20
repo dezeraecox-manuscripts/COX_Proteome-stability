@@ -78,10 +78,11 @@ if __name__ == "__main__":
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    sample_name = 'Heat'
+    sample_names = ['Heat', 'Urea']
     norm_cols = { #in format denatured/native
         '2': '1',
         '4': '3',
     }
 
-    main(sample_name, norm_cols)
+    for sample_name in sample_names:
+        main(sample_name, norm_cols)

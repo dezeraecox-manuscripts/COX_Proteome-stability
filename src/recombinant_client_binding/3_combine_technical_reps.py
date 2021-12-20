@@ -47,7 +47,7 @@ if __name__ == "__main__":
     output_folder = f'results/recombinant_client_assay/combine_technical_replicates/'
 
     technical_reps = ['A', 'B']
-    sample_names = ['Heat']
+    sample_names = ['Heat', 'Urea']
 
     # Define info variables
     info_cols = ['Sequence', 'Proteins', 'Gene names',

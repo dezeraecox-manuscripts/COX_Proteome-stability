@@ -123,4 +123,4 @@ if __name__ == "__main__":
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    tmt_cleaner(input_folder, output_folder, sample_names=['Heat-A', 'Heat-B',], proteins_file='proteinGroups.txt', peptides_file='peptides.txt', prot_cols=[], pep_cols=['Missed cleavages'])
+    tmt_cleaner(input_folder, output_folder, sample_names=['Heat-A', 'Heat-B', 'Urea-A', 'Urea-B'], proteins_file='proteinGroups.txt', peptides_file='peptides.txt', prot_cols=[], pep_cols=['Missed cleavages'])
