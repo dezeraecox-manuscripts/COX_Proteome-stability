@@ -11,7 +11,7 @@ logger.info('Import OK')
 
 if __name__ == "__main__":
 
-    url = 'https://zenodo.org/record/4280621/files/inhibitor_urea_denaturation.zip?download=1' 
+    url = 'https://zenodo.org/record/5794191/files/inhibitor_urea_denaturation.zip?download=1' 
     folder_name = 'inhibitor_urea_denaturation'
     output_folder = 'raw_data/'
 
